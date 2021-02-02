@@ -1,0 +1,358 @@
+---
+title: "Diabetes Classification"
+author: "Lovedeep Bajaj"
+date: "1/19/2021"
+output: html_document
+---
+
+Features:   
+__Age:__ how old the person is in years  
+__Gender:__ Male or Female    
+__Polyuria:__ No or Yes  
+__Polydipsia:__ No or Yes  
+__sudden.weight.loss:__ No or Yes  
+__weakness:__ No or Yes  
+__Polyphagia:__ No or Yes  
+__Genital.thrush:__ No or Yes  
+__visual.blurring Itching:__ No or Yes  
+__Irritability:__ No or Yes  
+__delayed.healing:__ No or Yes  
+__partial.paresis:__ No or Yes  
+__muscle.stiffness:__ No or Yes  
+__Alopecia:__ No or Yes  
+__Obesity:__ No or Yes    
+
+Label:   
+__class:__ Negative or Positive  
+
+```{r}
+# setting the working directory 
+setwd("~/Documents/R/Projects/Diabetes Classification")
+
+# read in the csv 
+df <- read.csv('diabetes_data_upload.csv')
+
+# viewing the first 5 values in the df
+head(df)
+```
+
+```{r}
+# seeing what the type of each column is 
+sapply(df, class)
+```
+
+```{r}
+# checking to see the length of the df 
+nrow(df)
+```
+
+```{r}
+# checking to see if any missing values in the features (there are no missing values) also making sure age 
+# doesn't contain any outliers
+summary(df)
+```
+
+```{r}
+# checking to see how many duplicates are in the dataset 
+nrow(df[duplicated(df), ])
+```
+
+## DATA VISUALIZATION
+```{r}
+# importing required library 
+library('ggplot2')
+
+# function for creating the plots
+create.plots <- function(df, x, fill, title){
+  plot.title = paste('Based On The', title, 'Feature Do People Have Diabetes')
+  p <- ggplot(data = df, aes(x = {{x}}, fill = {{fill}})) + 
+    geom_bar(position = position_dodge())+
+    ggtitle(plot.title)+
+    # removing the space between the x values and the bars
+    scale_y_continuous(expand = c(0,0)) + scale_x_discrete(expand = c(0,0)) + 
+    scale_fill_manual(values=c("#0a043c", "#03506f")) +
+    theme_classic()+
+    theme(
+      plot.title = element_text(
+        size = 12, # the size of the title
+        face = 'bold', # making sure the title is bold
+        hjust = 0.5, # centering title 
+        vjust = 3 # moving the title up 
+      ),
+      axis.ticks.x = element_blank(), # removing the ticks on the x axis
+      axis.title.y = element_blank(), # getting rid of the y axis title
+      axis.ticks.y = element_blank(), # removing the ticks on the y axis
+    )
+  return(p)
+}
+```
+
+### Age
+```{r}
+# binning the age
+df$Age.bin <- cut(df$Age, breaks = c(9,19,29,39,49,59,69,79,89,99), 
+                 labels = c('10-19', '20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '90-99'))
+title = 'Age Group'
+
+# creating the plot
+create.plots(df,Age.bin, class, title)
+```
+
+### Gender
+```{r}
+title = 'Gender'
+create.plots(df,Gender, class, title)
+```
+
+### Polyuria
+```{r}
+title = 'Polyuria'
+create.plots(df,Polyuria, class, title)
+```
+
+### Polydipsia 
+```{r}
+title = 'Polydipsia'
+create.plots(df,Polydipsia, class, title)
+```
+
+### Sudden weight loss 
+```{r}
+title = 'Sudden Weight Loss'
+create.plots(df,sudden.weight.loss, class, title)
+```
+
+### Weakness 
+```{r}
+title = 'Weakness'
+create.plots(df,weakness, class, title)
+```
+
+### Polyphagia 
+```{r}
+title = 'Polyphagia'
+create.plots(df,Polyphagia, class, title)
+```
+
+### Genital thrush
+```{r}
+title = 'Genital Thrush'
+create.plots(df,Genital.thrush, class, title)
+```
+
+### Visual blurring 
+```{r}
+title = 'Visual Blurring'
+create.plots(df,visual.blurring, class, title)
+```
+
+### Itching   
+```{r}
+title = 'Itching'
+create.plots(df,Itching, class, title)
+```
+
+### Irritability 
+```{r}
+title = 'Irritability'
+create.plots(df,Irritability, class, title)
+```
+
+### Delayed healing
+```{r}
+title = 'Delayed Healing'
+create.plots(df,delayed.healing, class, title)
+```
+
+### Partial paresis 
+```{r}
+title = 'Partial Paresis'
+create.plots(df,partial.paresis, class, title)
+```
+
+### Muscle stiffness 
+```{r}
+title = 'Muscle Stiffness'
+create.plots(df,muscle.stiffness, class, title)
+```
+
+### Alopecia 
+```{r}
+title = 'Alopecia'
+create.plots(df,Alopecia, class, title)
+```
+
+### Obesity 
+```{r}
+title = 'Obesity'
+create.plots(df,Obesity, class, title)
+```
+
+### Class
+```{r}
+title = 'How Many People Diabetes'
+ggplot(data = df, aes(x = class)) + 
+  geom_bar(fill = '#222831') +
+  xlab('Class')+
+  ggtitle(title) +
+  # removing the space between the x values and the bars
+  scale_y_continuous(expand = c(0,0)) + scale_x_discrete(expand = c(0,0)) + 
+  theme_classic()+
+  theme(
+    plot.title = element_text(
+      size = 12, # the size of the title
+      face = 'bold', # making sure the title is bold
+      hjust = 0.5, # centering title
+      vjust = 3 # moving the title up
+    ),
+    axis.ticks.x = element_blank(), # removing the ticks on the x axis
+    axis.title.y = element_blank(), # getting rid of the y axis title
+    axis.ticks.y = element_blank(), # removing the ticks on the y axis
+  )
+```
+
+## FEATURE TRANSFORMATION
+```{r}
+# importing required library
+library(dplyr)
+
+# converting all the features to type char
+df %>%
+  mutate_all(as.character) -> df
+```
+
+### Converting Gender
+```{r}
+# male = 0 and female = 1
+df$Gender[df$Gender == 'Male'] <- 0
+df$Gender[df$Gender == 'Female'] <- 1
+
+# checking to make sure the change occurred 
+unique(df$Gender)
+```
+
+### Converting Polyuria - Obesity
+```{r}
+# No = 0 and Yes = 1
+df[df == 'No'] <- 0
+df[df == 'Yes'] <- 1
+
+# checking to see if the values of Polyuria changed 
+unique(df$Polyuria)
+```
+
+### Converting Class
+```{r}
+# Negative = 0 and Positive = 1
+df$class[df$class == 'Negative'] <- 0
+df$class[df$class == 'Positive'] <- 1
+
+# checking to see if the values of class changed 
+unique(df$class)
+```
+
+
+```{r}
+# function that does min-max scaling because I want the values to be in a range of 0 and 1 
+normalize.min_max <- function(x){
+  return((x - min(x))/(max(x) - min(x)))
+}
+```
+
+### Scaling Age
+```{r}
+# converting Age to numeric type 
+df$Age <- as.numeric(df$Age)
+
+df$Age <- normalize.min_max(df$Age)
+
+# checking the summary of Age to make sure the scaling worked
+summary(df$Age)
+```
+
+### Converting Features to Factor
+```{r}
+# removing the Age.bin from the dataframe 
+df <- subset(df, select=-c(Age.bin))
+
+# converting the type of all the features to numeric
+df %>%
+  mutate_all(as.factor) -> df
+
+# making sure all the values are numeric and that they all contain the correct values
+summary(df)
+```
+
+### TRAINING AND TESTING SET
+```{r}
+# this preserves the results 
+set.seed(101)
+
+# import required library 
+library(caTools)
+
+# 70% training and 30% testing
+split = sample.split(df$class, SplitRatio = 0.7)
+training_df <- subset(df, split == TRUE)
+testing_df <- subset(df, split == FALSE)
+```
+
+```{r}
+# checking the number of rows in the training_df 
+nrow(training_df)
+```
+
+```{r}
+# checking to see how many people in the training_df have diabetes
+nrow(training_df[training_df$class == 1,])
+```
+
+```{r}
+# checking the number of rows in the testing_df 
+nrow(testing_df)
+```
+
+```{r}
+# checking to see how many people in the testing_df have diabetes
+nrow(testing_df[testing_df$class == 1,])
+```
+
+## MODEL COMPARSION
+Creating a decision tree and random forest model and seeing which one yields me the best results
+```{r}
+# importing required libraries
+library(caret) # install.packages('caret', dependencies = TRUE) <- e1071 error will occur
+library(party)
+
+# decision tree model
+tree.model <- ctree(class ~., data = training_df)
+
+# predicting with the model 
+tree.prediction <- predict(tree.model, testing_df)
+
+# view the confusion matrix 
+confusionMatrix(tree.prediction, testing_df$class)
+```
+This model is extremely good with an Accuracy of 92% and Sensitivity of .0.9333 Specificity : 0.9167. 
+
+
+```{r}
+# importing required library 
+library(randomForest)
+
+# random forest model
+forest.model <- randomForest(class ~., data = training_df)
+
+# predicting with the model 
+forest.predict <- predict(forest.model, testing_df)
+
+# viewing the confusion matrix 
+confusionMatrix(forest.predict, testing_df$class)
+```
+This model gives us a better accuracy and specificity then the decision tree. The Accuracy is 96% and the Specificity is 1.0000. 
+
+#### BEST MODEL: RANDOM FOREST
+
+
+
+
